@@ -1,3 +1,6 @@
+# Definir formato de numero decimales
+options(digits = 10)
+
 # Elipsoide
 
 names_elip <- c('PSAD-56',	'SAD-69',	'WGS-84',	'GRS-80 (SIRGAS)')
@@ -74,7 +77,7 @@ E3(a[4],divF[4],rad)
 # Valor de M
 
 M <- function(x,y,z){
-  (x*(1 - (1-((x-1/y*x)^2/x^2))))/((1 - (1-((x-1/y*x)^2/x^2))*sin(z)^2)^(3/2))
+  (x*(1-(1-((x-1/y*x)^2/x^2))))/((1-(1-((x-1/y*x)^2/x^2))*sin(z)^2)^(3/2))
 }
 
 M(a[4],divF[4],rad)
