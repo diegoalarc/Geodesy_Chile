@@ -2,7 +2,7 @@
 
 names_elip <- c('PSAD-56',	'SAD-69',	'WGS-84',	'GRS-80 (SIRGAS)')
 a <-	c(6378388,	6378160,	6378137,	6378137)
-divF <- 	c(297,	298.25,	298.257223563,	298.257222101)
+divF <- c(297,	298.25,	298.257223563,	298.257222101)
 
 # Funtions
 
@@ -24,6 +24,8 @@ e2 <- function(x,y) {
 
 Elipsoide <- as.data.frame(cbind(names_elip, a, divF, f(divF), b(a,divF), e(a,divF),e2(a,divF)))
 names(Elipsoide) <- c("ELIPSOIDES", "a", "1/f", "f", "b", "e^2", "e´^2")
+
+print(Elipsoide)
 
 # Lat
 
@@ -47,3 +49,16 @@ radianes <- function(x,y,z){
 
 sexagesimal(g,m,s)
 radianes(g,m,s)
+
+#  Radius of curvature SIRGAS
+print(Elipsoide[4, 6])
+
+#    (1-e^2)
+E2 <- function(x){
+  1 - x
+}
+
+#    1-e^2*sen(lat)^2
+E3 <- (1 - 0.006694380022900*sin(-0.5871584)^2)
+
+M <- 
