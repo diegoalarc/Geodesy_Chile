@@ -1,5 +1,6 @@
 # Definir formato de numero decimales
 options(digits = 10)
+decimal=TRUE
 
 # Elipsoide
 
