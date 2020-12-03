@@ -54,11 +54,53 @@ radianes(g,m,s)
 print(Elipsoide[4, 6])
 
 #    (1-e^2)
-E2 <- function(x){
-  1 - x
+E2 <- function(x,y){
+  1 - (1-((x-1/y*x)^2/x^2))
 }
 
-#    1-e^2*sen(lat)^2
-E3 <- (1 - 0.006694380022900*sin(-0.5871584)^2)
+# se usan "a" y "1/f" desde Elipsoide
+E2(a[4],divF[4])
 
-M <- 
+#    1-e^2*sen(lat)^2
+E3 <- function(x,y,z){
+  (1 - (1-((x-1/y*x)^2/x^2))*sin(z)^2)
+}
+
+# Valor en radianes
+rad <- radianes(g,m,s)
+
+E3(a[4],divF[4],rad)
+
+# Valor de M
+
+M <- function(x,y,z){
+  (x*(1 - (1-((x-1/y*x)^2/x^2))))/((1 - (1-((x-1/y*x)^2/x^2))*sin(z)^2)^(3/2))
+}
+
+M(a[4],divF[4],rad)
+
+# Valor de N
+
+N <- function(x,y,z){
+  x/sqrt((1 - (1-((x-1/y*x)^2/x^2))*sin(z)^2))
+}
+
+N(a[4],divF[4],rad)
+
+## ARCOS MERIDIANOS Y PARALELOS
+
+r <- function(x,y){
+  x*cos(y)
+}
+
+# Lat
+
+g <- -33
+m <- 30
+s <- 0
+
+# Valor en radianes
+rad <- radianes(g,m,s)
+nn <- N(a[4],divF[4],rad)
+
+r(nn,rad)
