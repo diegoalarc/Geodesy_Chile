@@ -4,7 +4,7 @@ decimal=TRUE
 
 # Elipsoide
 
-names_elip <- c('PSAD-56',	'SAD-69',	'WGS-84',	'GRS-80 (SIRGAS)')
+names_elip <- c('PSAD-56', 'SAD-69',	'WGS-84',	'GRS-80 (SIRGAS)')
 a <-	c(6378388,	6378160,	6378137,	6378137)
 divF <- c(297,	298.25,	298.257223563,	298.257222101)
 
@@ -26,8 +26,15 @@ e2 <- function(x,y) {
   (x^2/(x-1/y*x)^2)-1
 }
 
-Elipsoide <- as.data.frame(cbind(names_elip, a, divF, f(divF), b(a,divF), e(a,divF),e2(a,divF)))
+Elipsoide <- as.data.frame(cbind(names_elip, a, divF, f(divF), 
+                                 b(a,divF), e(a,divF),e2(a,divF)))
 names(Elipsoide) <- c("ELIPSOIDES", "a", "1/f", "f", "b", "e^2", "e´^2")
+
+# Separacion de cada Elipsoide
+#PSAD56 <- Elipsoide[1,1:7]
+#SAD69 <- Elipsoide[2,1:7]
+#WGS84 <- Elipsoide[3,1:7]
+#GRS80 <- Elipsoide[4,1:7]
 
 print(Elipsoide)
 
@@ -58,38 +65,40 @@ radianes(g,m,s)
 print(Elipsoide[4, 6])
 
 #    (1-e^2)
-E2 <- function(x,y){
-  1 - (1-((x-1/y*x)^2/x^2))
+# 1 = 'PSAD-56', 2 = 'SAD-69',	3 = 'WGS-84',	4 ='GRS-80 (SIRGAS)'
+E2 <- function(x){
+  1 - as.numeric(Elipsoide[x,6])
 }
 
-# se usan "a" y "1/f" desde Elipsoide
-E2(a[4],divF[4])
+# se usan "a" y "1/f" desde Elipsoide seleccionado
+E2(4)
 
 #    1-e^2*sen(lat)^2
-E3 <- function(x,y,z){
-  (1 - (1-((x-1/y*x)^2/x^2))*sin(z)^2)
+# 1 = 'PSAD-56', 2 = 'SAD-69',	3 = 'WGS-84',	4 ='GRS-80 (SIRGAS)'
+E3 <- function(x,y){
+  (1 - as.numeric(Elipsoide[x,6])*sin(y)^2)
 }
 
 # Valor en radianes
 rad <- radianes(g,m,s)
 
-E3(a[4],divF[4],rad)
+E3(4,rad)
 
 # Valor de M
-
-M <- function(x,y,z){
-  (x*(1-(1-((x-1/y*x)^2/x^2))))/((1-(1-((x-1/y*x)^2/x^2))*sin(z)^2)^(3/2))
+# 1 = 'PSAD-56', 2 = 'SAD-69',	3 = 'WGS-84',	4 ='GRS-80 (SIRGAS)'
+M <- function(x,y){
+  as.numeric(Elipsoide[x,2])*(1 - as.numeric(Elipsoide[x,6]))/(1 - as.numeric(Elipsoide[x,6])*sin(y)^2)^(3/2)
 }
 
-M(a[4],divF[4],rad)
+M(4,rad)
 
 # Valor de N
 
-N <- function(x,y,z){
-  x/sqrt((1 - (1-((x-1/y*x)^2/x^2))*sin(z)^2))
+N <- function(x,y){
+  as.numeric(Elipsoide[x,2])/sqrt(1 - as.numeric(Elipsoide[x,6])*sin(y)^2)
 }
 
-N(a[4],divF[4],rad)
+N(4,rad)
 
 ## ARCOS MERIDIANOS Y PARALELOS
 
@@ -105,6 +114,6 @@ s <- 0
 
 # Valor en radianes
 rad <- radianes(g,m,s)
-nn <- N(a[4],divF[4],rad)
+nn <- N(4,rad)
 
 r(nn,rad)
