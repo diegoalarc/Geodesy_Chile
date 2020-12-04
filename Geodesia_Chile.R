@@ -93,7 +93,7 @@ M <- function(x,y){
 M(4,rad)
 
 # Valor de N
-
+# 1 = 'PSAD-56', 2 = 'SAD-69',	3 = 'WGS-84',	4 ='GRS-80 (SIRGAS)'
 N <- function(x,y){
   as.numeric(Elipsoide[x,2])/sqrt(1 - as.numeric(Elipsoide[x,6])*sin(y)^2)
 }
@@ -101,9 +101,9 @@ N <- function(x,y){
 N(4,rad)
 
 ## ARCOS MERIDIANOS Y PARALELOS
-
+# 1 = 'PSAD-56', 2 = 'SAD-69',	3 = 'WGS-84',	4 ='GRS-80 (SIRGAS)'
 r <- function(x,y){
-  x*cos(y)
+  as.numeric(Elipsoide[x,2])/sqrt(1 - as.numeric(Elipsoide[x,6])*sin(y)^2)*cos(y)
 }
 
 # Lat
@@ -114,6 +114,39 @@ s <- 0
 
 # Valor en radianes
 rad <- radianes(g,m,s)
-nn <- N(4,rad)
 
-r(nn,rad)
+r(4,rad)
+
+S <- function(x,y){
+  (as.numeric(Elipsoide[x,2])*(1 - as.numeric(Elipsoide[x,6]))/(1 - as.numeric(Elipsoide[x,6])*sin(y)^2)^(3/2))*y
+}
+
+S(4,rad)
+
+L <- function(x,y){
+  (as.numeric(Elipsoide[x,2])/sqrt(1 - as.numeric(Elipsoide[x,6])*sin(y)^2)*cos(y))*y
+}
+
+L(4,rad)
+
+# CALCULO DE DIFERENCIAS EN LATITUD Y LONGITUD
+# Generar formulas de estos
+
+# GEODETIC TO CARTESIAN
+# Letter a <- 1 = 'PSAD-56', 2 = 'SAD-69',	3 = 'WGS-84',	4 ='GRS-80 (SIRGAS)'
+# Letter b <- ELLIPSOIDAL HEIGHT (h)
+# Letter c <- rad Latitude
+# Letter d <- rad longitude
+cartesian <- function(a,b,c,d){
+  valueX <- (as.numeric(Elipsoide[a,2])/sqrt(1 - as.numeric(Elipsoide[a,6])*sin(c)^2)+b)*cos(c)*cos(d)
+  valueY <- (as.numeric(Elipsoide[a,2])/sqrt(1 - as.numeric(Elipsoide[a,6])*sin(c)^2)+b)*cos(c)*sin(d)
+  valueZ <- ((as.numeric(Elipsoide[a,2])/sqrt(1 - as.numeric(Elipsoide[a,6])*sin(c)^2)*cos(c))*1 - as.numeric(Elipsoide[a,6])+b)*sin(c)
+  return(list(valueX, valueY, valueZ))
+}
+
+rad_lat <- -0.579580766807051
+rad_lon <- -1.24463726711795
+h <- 31.885
+
+# Review Formula
+cartesian(1,h, rad_lat, rad_lon)
