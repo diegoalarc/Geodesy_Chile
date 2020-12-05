@@ -3,39 +3,44 @@
 #devtools::install_github("r-lib/devtools")
 #devtools::load_all(path = '/home/diego/GITHUP_REPO/Geodesy_Chile')
 
-# Definir formato de numero decimales
+# Define decimal number format
 options(digits = 10)
 decimal=TRUE
 
-# Elipsoides
-
+# Ellipsoids
 names_elip <- c('PSAD-56', 'SAD-69',	'WGS-84',	'GRS-80 (SIRGAS)')
 a <-	c(6378388,	6378160,	6378137,	6378137)
 divF <- c(297,	298.25,	298.257223563,	298.257222101)
 
-# Funtions
-
-f <- function(x) {
-  1/x
-}
-
-b <- function(x,y) {
-  x-1/y*x
-}
-
-e <- function(x,y) {
-  1-((x-1/y*x)^2/x^2)
-}
-
-e2 <- function(x,y) {
-  (x^2/(x-1/y*x)^2)-1
-}
-
-Elipsoide <- as.data.frame(cbind(names_elip, a, divF, f(divF), 
-                                 b(a,divF), e(a,divF),e2(a,divF)))
+Elipsoide <- as.data.frame(cbind(names_elip, a, divF, 1/divF,
+                                 a-1/divF*a, 1-((a-1/divF*a)^2/a^2),
+                                 (a^2/(a-1/divF*a)^2)-1))
 names(Elipsoide) <- c("ELIPSOIDES", "a", "1/f", "f", "b", "e^2", "e´^2")
 
-# Separacion de cada Elipsoide
+# Funtions
+# do not reproduce
+#f <- function(x) {
+#  1/x
+#}
+
+#b <- function(x,y) {
+#  x-1/y*x
+#}
+
+#e <- function(x,y) {
+#  1-((x-1/y*x)^2/x^2)
+#}
+
+#e2 <- function(x,y) {
+#  (x^2/(x-1/y*x)^2)-1
+#}
+
+#Elipsoide <- as.data.frame(cbind(names_elip, a, divF, f(divF), 
+#                                 b(a,divF), e(a,divF),e2(a,divF)))
+#names(Elipsoide) <- c("ELIPSOIDES", "a", "1/f", "f", "b", "e^2", "e´^2")
+
+# Separation test of each Ellipsoid
+# do not reproduce
 #PSAD56 <- Elipsoide[1,1:7]
 #SAD69 <- Elipsoide[2,1:7]
 #WGS84 <- Elipsoide[3,1:7]
@@ -43,28 +48,29 @@ names(Elipsoide) <- c("ELIPSOIDES", "a", "1/f", "f", "b", "e^2", "e´^2")
 
 print(Elipsoide)
 
+##
+# Test data
 # Lat
-
 g <- -33
 m <- 38
 s <- 30.123456
 
 # Long
-
 g1 <- -70
 m1 <- 41
 s1 <- 35.123456
+##
 
 sexagesimal <- function(x,y,z){
   x-(y/60)-(z/3600)
 }
 
-radianes <- function(x,y,z){
+radians <- function(x,y,z){
   (x-(y/60)-(z/3600))*pi/180
 }
 
 sexagesimal(g,m,s)
-radianes(g,m,s)
+radians(g,m,s)
 
 #  Radius of curvature SIRGAS
 print(Elipsoide[4, 6])
@@ -75,7 +81,7 @@ E2 <- function(x){
   1 - as.numeric(Elipsoide[x,6])
 }
 
-# se usan "a" y "1/f" desde Elipsoide seleccionado
+# "a" and "1 / f" are used from selected Ellipsoid
 E2(4)
 
 #    1-e^2*sen(lat)^2
@@ -84,12 +90,12 @@ E3 <- function(x,y){
   (1 - as.numeric(Elipsoide[x,6])*sin(y)^2)
 }
 
-# Valor en radianes
-rad <- radianes(g,m,s)
+# Value in radians
+rad <- radians(g,m,s)
 
 E3(4,rad)
 
-# Valor de M
+# Value of M
 # 1 = 'PSAD-56', 2 = 'SAD-69',	3 = 'WGS-84',	4 ='GRS-80 (SIRGAS)'
 M <- function(x,y){
   as.numeric(Elipsoide[x,2])*(1 - as.numeric(Elipsoide[x,6]))/(1 - as.numeric(Elipsoide[x,6])*sin(y)^2)^(3/2)
@@ -97,7 +103,7 @@ M <- function(x,y){
 
 M(4,rad)
 
-# Valor de N
+# Value of N
 # 1 = 'PSAD-56', 2 = 'SAD-69',	3 = 'WGS-84',	4 ='GRS-80 (SIRGAS)'
 N <- function(x,y){
   as.numeric(Elipsoide[x,2])/sqrt(1 - as.numeric(Elipsoide[x,6])*sin(y)^2)
@@ -105,20 +111,22 @@ N <- function(x,y){
 
 N(4,rad)
 
-## ARCOS MERIDIANOS Y PARALELOS
+## MERIDIAN AND PARALLEL ARCHES
 # 1 = 'PSAD-56', 2 = 'SAD-69',	3 = 'WGS-84',	4 ='GRS-80 (SIRGAS)'
 r <- function(x,y){
   as.numeric(Elipsoide[x,2])/sqrt(1 - as.numeric(Elipsoide[x,6])*sin(y)^2)*cos(y)
 }
 
+##
+# Test data
 # Lat
-
 g <- -33
 m <- 30
 s <- 0
 
-# Valor en radianes
+# Value in radians
 rad <- radianes(g,m,s)
+##
 
 r(4,rad)
 
@@ -134,8 +142,30 @@ L <- function(x,y){
 
 L(4,rad)
 
-# CALCULO DE DIFERENCIAS EN LATITUD Y LONGITUD
-# Generar formulas de estos
+# CALCULATION OF DIFFERENCES IN LATITUDE AND LENGTH
+# Generate formulas of these
+
+##
+# Test data
+# Lat
+g <- -33
+m <- 12
+s <- 27.11457
+
+# Value in radians
+rad_lat <- radianes(g,m,s)
+
+# Lon
+g <- -71
+m <- 18
+s <- 44.86475
+
+# Value in radians
+rad_lon <- radianes(g,m,s)
+
+# ELLIPSOIDAL HEIGHT (h)
+h <- 31.885
+##
 
 # GEODETIC TO CARTESIAN
 # Letter a <- 1 = 'PSAD-56', 2 = 'SAD-69',	3 = 'WGS-84',	4 ='GRS-80 (SIRGAS)'
@@ -146,11 +176,73 @@ cartesian <- function(a,b,c,d){
   valueX <- (as.numeric(Elipsoide[a,2])/sqrt(1 - as.numeric(Elipsoide[a,6])*sin(c)^2)+b)*cos(c)*cos(d)
   valueY <- (as.numeric(Elipsoide[a,2])/sqrt(1 - as.numeric(Elipsoide[a,6])*sin(c)^2)+b)*cos(c)*sin(d)
   valueZ <- ((as.numeric(Elipsoide[a,2])/sqrt(1 - as.numeric(Elipsoide[a,6])*sin(c)^2))*(1 - as.numeric(Elipsoide[a,6]))+b)*sin(c)
-  return(list(valueX, valueY, valueZ))
+  values <- data.frame(valueX, valueY, valueZ)
+  names(values) <- c("X", "Y", "Z")
+  return(values)
 }
 
-rad_lat <- -0.579580766807051
-rad_lon <- -1.24463726711795
-h <- 31.885
+cartesian(4,h, rad_lat, rad_lon)
 
-cartesian(1,h, rad_lat, rad_lon)
+# TRANSFORMATION FROM CARTESIAN TO GEODETIC
+# AUXILIARY
+
+##
+# Test data
+x <- 1711591.78090565
+y <- -5060304.1659587
+z <- -3473256.69328603
+##
+
+d <- function(x,y){
+  sqrt(x^2+y^2)
+}
+
+d(x,y)
+
+sata <- function(a,x,y,z){
+  atan((as.numeric(Elipsoide[a,2])*z)/(as.numeric(Elipsoide[a,5])*sqrt(x^2+y^2)))
+}
+
+sata(4,x,y,z)
+
+Latitude <- function(a,x,y,z){
+  atan((z+as.numeric(Elipsoide[a,5])*as.numeric(Elipsoide[a,7])*sin(atan((as.numeric(Elipsoide[a,2])*z)/(as.numeric(Elipsoide[a,5])*sqrt(x^2+y^2))))^3)/((sqrt(x^2+y^2))-as.numeric(Elipsoide[a,2])*as.numeric(Elipsoide[a,6])*cos(atan((as.numeric(Elipsoide[a,2])*z)/(as.numeric(Elipsoide[a,5])*sqrt(x^2+y^2))))^3))
+}
+
+Latitude(4,x,y,z)
+
+Longitude <- function(x,y){
+  atan(y/x)
+}
+
+Longitude(x,y)
+
+Height <- function(a,x,y,z){
+  d <- sqrt(x^2+y^2)
+  lat <- atan((z+as.numeric(Elipsoide[a,5])*as.numeric(Elipsoide[a,7])*sin(atan((as.numeric(Elipsoide[a,2])*z)/(as.numeric(Elipsoide[a,5])*sqrt(x^2+y^2))))^3)/((sqrt(x^2+y^2))-as.numeric(Elipsoide[a,2])*as.numeric(Elipsoide[a,6])*cos(atan((as.numeric(Elipsoide[a,2])*z)/(as.numeric(Elipsoide[a,5])*sqrt(x^2+y^2))))^3))
+  N <- as.numeric(Elipsoide[a,2])/sqrt(1 - as.numeric(Elipsoide[a,6])*sin(lat)^2)
+  H <- (d/cos(lat))-N
+  return(H)
+}
+
+Height(4,x,y,z)
+
+Lat_lon_height <- function(a,x,y,z){
+  d <- sqrt(x^2+y^2)
+  lon <- atan(y/x)
+  lat <- atan((z+as.numeric(Elipsoide[a,5])*as.numeric(Elipsoide[a,7])*sin(atan((as.numeric(Elipsoide[a,2])*z)/(as.numeric(Elipsoide[a,5])*sqrt(x^2+y^2))))^3)/((sqrt(x^2+y^2))-as.numeric(Elipsoide[a,2])*as.numeric(Elipsoide[a,6])*cos(atan((as.numeric(Elipsoide[a,2])*z)/(as.numeric(Elipsoide[a,5])*sqrt(x^2+y^2))))^3))
+  N <- as.numeric(Elipsoide[a,2])/sqrt(1 - as.numeric(Elipsoide[a,6])*sin(lat)^2)
+  H <- (d/cos(lat))-N
+  values <- data.frame(lat, lon, H)
+  names(values) <- c("lat", "lon", "H")
+  return(values)
+}
+
+Lat_lon_height(4,x,y,z)
+
+# ELECTRONIC DISTANCE REDUCTION
+# TODO
+
+# REDUCCION DE DISTANCIA HORIZONTAL AL ELIPSOIDE (DISTANCIA GEODESICA)
+# TODO
+
