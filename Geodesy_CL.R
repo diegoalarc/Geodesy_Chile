@@ -33,7 +33,7 @@ Elipsoide <- as.data.frame(cbind(names_elip, a, divF, 1/divF,
                                  ))
 names(Elipsoide) <- c("ELIPSOIDES", "a", "1/f", "f", "b", "e^2", "e´^2", 
                       "A", "B", "C", "D", "E", "F",
-                      "??", "??", "??", "??", "??", "ç")
+                      "Alfa", "Beta", "Gamma", "Delta", "Epsilon", "Zeta")
 
 # Funtions
 # do not reproduce
@@ -261,25 +261,22 @@ Lat_lon_height(4,x,y,z)
 # ELECTRONIC DISTANCE REDUCTION
 # TODO
 
-# REDUCCION DE DISTANCIA HORIZONTAL AL ELIPSOIDE (DISTANCIA GEODESICA)
+# REDUCTION OF HORIZONTAL DISTANCE TO THE ELLIPSOID (GEODESIC DISTANCE)
 # Approximate radius of the Earth
 # If h is constant, then (R + h) / R is also constant
 # (R + h) / R = scale factor due to height kh
 # Test data
-R	= 63780000
-h = 2500
-Dhz	= 728.5
-
-
-Kh <- function(x){
-  (63780000+x)/63780000
-}
-
-Kh(h)
+R	<- 63780000
+h <- 2500
+Dhz <- 728.5
 
 # Geodetic distance
 Geodis <- function(x,y){
-  y/((63780000+x)/63780000)
+  A <- (63780000+x)/63780000
+  B <- y/((63780000+x)/63780000)
+  values <- data.frame(as.numeric(A), as.numeric(B))
+  names(values) <- c("Kh(h)", "GEODESIC DISTANCE")
+  return(values)
 }
 
 Geodis(h,Dhz)
@@ -321,14 +318,14 @@ SCALE_FACTOR(EAST, arch_data)
 
 # TRANSFORMATION OF GEODETIC COORDINATES TO TM
 
+##
+# Test data
 # PARAMETERS
 MC <- -69.00000
 SC_FACTOR_Ko <- 0.99960
 EF <- 500000.00000
 NF <- 10000000.00000
 
-##
-# Test data
 # Lat
 g <- -33
 m <- 12
