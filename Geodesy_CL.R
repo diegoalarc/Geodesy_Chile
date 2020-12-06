@@ -233,7 +233,7 @@ Lat_lon_height <- function(a,x,y,z){
   lat <- atan((z+as.numeric(Elipsoide[a,5])*as.numeric(Elipsoide[a,7])*sin(atan((as.numeric(Elipsoide[a,2])*z)/(as.numeric(Elipsoide[a,5])*sqrt(x^2+y^2))))^3)/((sqrt(x^2+y^2))-as.numeric(Elipsoide[a,2])*as.numeric(Elipsoide[a,6])*cos(atan((as.numeric(Elipsoide[a,2])*z)/(as.numeric(Elipsoide[a,5])*sqrt(x^2+y^2))))^3))
   N <- as.numeric(Elipsoide[a,2])/sqrt(1 - as.numeric(Elipsoide[a,6])*sin(lat)^2)
   H <- (d/cos(lat))-N
-  values <- data.frame(lat, lon, H)
+  values <- data.frame(as.numeric(lat), as.numeric(lon), as.numeric(H))
   names(values) <- c("lat", "lon", "H")
   return(values)
 }
@@ -244,5 +244,62 @@ Lat_lon_height(4,x,y,z)
 # TODO
 
 # REDUCCION DE DISTANCIA HORIZONTAL AL ELIPSOIDE (DISTANCIA GEODESICA)
-# TODO
+# Approximate radius of the Earth
+# If h is constant, then (R + h) / R is also constant
+# (R + h) / R = scale factor due to height kh
+# Test data
+R	= 63780000
+h = 2500
+Dhz	= 728.5
 
+
+Kh <- function(x){
+  (63780000+x)/63780000
+}
+
+Kh(h)
+
+# Geodetic distance
+Geodis <- function(x,y){
+  y/((63780000+x)/63780000)
+}
+
+Geodis(h,Dhz)
+
+# REDUCING THE ROPE TO THE ELLIPTICAL ARCH
+# Test data
+ROPE <- 50000
+
+ARCH <- function(x){
+  value1 <- (x^3)/(24*63780000*63780000)
+  value2 <- value1*1000000
+  values <- data.frame(as.numeric(value1), as.numeric(value2))
+  names(values) <- c("ARCO (S)", "PPM")
+  return(values)
+}
+
+ARCH(ROPE)
+
+# CALCULATION OF SCALE FACTOR
+# The origin of the distances is the ellipsoid:
+# Geodesic dist * Scale factor K = Mapping distance (UTM)
+# Test data
+# Pichilemu EAST = 224200
+EAST <- 224200
+arch_data <- Geodis(h,Dhz)
+
+SCALE_FACTOR <- function(x, y){
+  valueX <- 500000-x
+  K_UTM <- 0.9996*(1+(valueX^2/(2*6378000^2)))
+  D_UTM <- y*K_UTM
+  DIF_DS <- D_UTM-y
+  PPM <- (DIF_DS/D_UTM)*1000000
+  values <- data.frame(as.numeric(valueX), as.numeric(K_UTM), as.numeric(D_UTM), 
+                       as.numeric(DIF_DS), as.numeric(PPM))
+  names(values) <- c("X", "K UTM","D UTM", "DIF D-S", "PPM")
+  return(values)
+}
+SCALE_FACTOR(EAST, arch_data)
+
+# TRANSFORMATION OF GEODETIC COORDINATES TO TM
+# TODO
