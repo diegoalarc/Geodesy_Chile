@@ -12,6 +12,7 @@ names_elip <- c('PSAD-56', 'SAD-69',	'WGS-84',	'GRS-80 (SIRGAS)')
 a <-	c(6378388,	6378160,	6378137,	6378137)
 divF <- c(297,	298.25,	298.257223563,	298.257222101)
 PO <- 180/pi
+Sin_1 <- pi/(180*3600)
 
 Elipsoide <- as.data.frame(cbind(names_elip, a, divF, 1/divF,
                                  a-1/divF*a, 
@@ -142,7 +143,7 @@ m <- 30
 s <- 0
 
 # Value in radians
-rad <- radianes(g,m,s)
+rad <- radians(g,m,s)
 ##
 
 r(4,rad)
@@ -170,7 +171,7 @@ m <- 12
 s <- 27.11457
 
 # Value in radians
-rad_lat <- radianes(g,m,s)
+rad_lat <- radians(g,m,s)
 
 # Lon
 g <- -71
@@ -178,7 +179,7 @@ m <- 18
 s <- 44.86475
 
 # Value in radians
-rad_lon <- radianes(g,m,s)
+rad_lon <- radians(g,m,s)
 
 # ELLIPSOIDAL HEIGHT (h)
 h <- 31.885
@@ -319,4 +320,70 @@ SCALE_FACTOR <- function(x, y){
 SCALE_FACTOR(EAST, arch_data)
 
 # TRANSFORMATION OF GEODETIC COORDINATES TO TM
-# TODO
+
+# PARAMETERS
+MC <- -69.00000
+SC_FACTOR_Ko <- 0.99960
+EF <- 500000.00000
+NF <- 10000000.00000
+
+##
+# Test data
+# Lat
+g <- -33
+m <- 12
+s <- 27.11457
+
+# Value in radians
+sexa_lat <- sexagesimal(g,m,s)
+#rad_lat <- radians(g,m,s)
+
+# Lon
+g <- -71
+m <- 18
+s <- 44.86475
+
+# Value in radians
+sexa_lon <- sexagesimal(g,m,s)
+#rad_lon <- radians(g,m,s)
+
+# ELLIPSOIDAL HEIGHT (h)
+h <- 31.885
+##
+
+# Letter a <- 1 = 'PSAD-56', 2 = 'SAD-69',	3 = 'WGS-84',	4 ='GRS-80 (SIRGAS)'
+# Letter b <- sexagesimal latitude
+# Letter c <- sexagesimal longitude
+# Letter d <- MC
+# Letter e <- SCALE FACTOR Ko
+# Letter f <- EAST False (EF)
+# Letter g <- North False (NF)
+TO_TM <- function(a,b,c,d,e,f,g){
+  N <- as.numeric(Elipsoide[a,2])/sqrt(1-as.numeric(Elipsoide[a,6])*sin(b*pi/180)^2)
+  DELTA_LAMBA <- (c-d)*3600
+  a1 <- as.numeric(Elipsoide[a,14])*b
+  b1 <- as.numeric(Elipsoide[a,15])*sin(2*(b*pi/180))
+  c1 <- as.numeric(Elipsoide[a,16])*sin(4*(b*pi/180))
+  d1 <- as.numeric(Elipsoide[a,17])*sin(6*(b*pi/180))
+  e1 <- as.numeric(Elipsoide[a,18])*sin(8*(b*pi/180))
+  f1 <- as.numeric(Elipsoide[a,19])*sin(10*(b*pi/180))
+  Be <- a1-b1+c1-d1+e1-f1
+  t <- tan(b*pi/180)
+  n <- sqrt(as.numeric(Elipsoide[a,7]))*cos(b*pi/180)
+  N1 <- (1/2)*(DELTA_LAMBA^2)*N*sin(b*pi/180)*cos(b*pi/180)*(Sin_1^2)
+  N2 <- (1/24)*(DELTA_LAMBA^4)*N*sin(b*pi/180)*(cos(b*pi/180)^3)*(Sin_1^4)*(5-(t^2)+(9*n^2)+(4*(n^4)))
+  N3 <- (1/720)*(DELTA_LAMBA^6)*N*sin(b*pi/180)*(cos(b*pi/180)^5)*(Sin_1^6)*(61-(58*(t^2))+(720*(n^2))-(350*(t^2)*(n^2)))
+  Y <- e*(N1+N2+N3+Be)
+  North <- Y+g
+  E1 <- DELTA_LAMBA*N*cos(b*pi/180)*Sin_1
+  E2 <- (1/6)*(DELTA_LAMBA^3)*N*(cos(b*pi/180)^3)*(Sin_1^3)*(1-(t^2)+(n^2))
+  E3 <- (1/120)*(DELTA_LAMBA^5)*N*(cos(b*pi/180)^5)*(Sin_1^5)*(5-(18*(t^2))+(t^4)+(14*(n^2))-(58*(t^2)*(n^2)))
+  X <- e*(E1+E2+E3)
+  East <- X+f
+  values <- data.frame(as.numeric(East), as.numeric(North), as.numeric(X), as.numeric(Y))
+  names(values) <- c("East", "North", "X", "Y")
+  return(values)
+}
+
+# Review the final result
+TO_TM(4, sexa_lat, sexa_lon, MC, SC_FACTOR_Ko, EF, NF)
