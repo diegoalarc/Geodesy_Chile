@@ -1,3 +1,15 @@
+# https://bookdown.org/rdpeng/RProgDA/data-within-a-package.html
+# https://grasshoppermouse.github.io/2017/10/18/put-your-data-in-an-r-package/
+# https://www.mzes.uni-mannheim.de/socialsciencedatalab/article/r-package/
+
+# Package to check the availability of the package name
+#install.packages("available")
+library(available)
+available(GeodesiCL)
+
+#install.packages("usethis")
+library('usethis')
+
 #library("devtools")
 #library("roxygen2")
 #devtools::install_github("r-lib/devtools")
@@ -5,7 +17,6 @@
 
 # Define decimal number format
 options(digits = 10)
-decimal=TRUE
 
 # Ellipsoids
 names_elip <- c('PSAD-56', 'SAD-69', 'WGS-84', 'GRS-80 (SIRGAS)')
