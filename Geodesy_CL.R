@@ -8,9 +8,9 @@ options(digits = 10)
 decimal=TRUE
 
 # Ellipsoids
-names_elip <- c('PSAD-56', 'SAD-69',	'WGS-84',	'GRS-80 (SIRGAS)')
-a <-	c(6378388,	6378160,	6378137,	6378137)
-divF <- c(297,	298.25,	298.257223563,	298.257222101)
+names_elip <- c('PSAD-56', 'SAD-69', 'WGS-84', 'GRS-80 (SIRGAS)')
+a <-	c(6378388, 6378160, 6378137, 6378137)
+divF <- c(297, 298.25, 298.257223563, 298.257222101)
 PO <- 180/pi
 Sin_1 <- pi/(180*3600)
 
@@ -266,7 +266,7 @@ Lat_lon_height(4,x,y,z)
 # If h is constant, then (R + h) / R is also constant
 # (R + h) / R = scale factor due to height kh
 # Test data
-R	<- 63780000
+R<- 63780000
 h <- 2500
 Dhz <- 728.5
 
